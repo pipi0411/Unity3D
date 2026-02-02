@@ -4,32 +4,31 @@ using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
+    private Player player;
     private PlayerControls controls;
     private CharacterController characterController;
     private Animator animator;
     [Header("Movement Settings")]
     [SerializeField] private float walkSpeed;
+    [SerializeField] private float runSpeed;
+    private float speed;
     private Vector3 movementDirection;
     private float verticalVelocity;
+    private  bool isRunning;
     [Header("Aim info")]
     [SerializeField] private Transform aim;
     [SerializeField] private LayerMask aimLayerMask;
     private Vector3 lookingDirection;
     private Vector2 moveInput;
     private Vector2 aimInput;
-    private void Awake()
-    {
-        controls = new PlayerControls();
-        controls.Character.Movement.performed += ctx => moveInput = ctx.ReadValue<Vector2>();
-        controls.Character.Movement.canceled += ctx => moveInput = Vector2.zero;
-        
-        controls.Character.Aim.performed += ctx => aimInput = ctx.ReadValue<Vector2>();
-        controls.Character.Aim.canceled += ctx => aimInput = Vector2.zero;
-    }
+
     private void Start()
     {
+        player = GetComponent<Player>();
         characterController = GetComponent<CharacterController>();
         animator = GetComponentInChildren<Animator>();
+        speed = walkSpeed;
+        AssignInputEvents();
     }
     private void Update()
     {
@@ -44,6 +43,9 @@ public class PlayerMovement : MonoBehaviour
 
         animator.SetFloat("xVelocity", xVelocity, 0.1f, Time.deltaTime);
         animator.SetFloat("zVelocity", zVelocity, 0.1f, Time.deltaTime);
+
+        bool playRunAnimation = isRunning && movementDirection.magnitude > 0;
+        animator.SetBool("isRunning", playRunAnimation);
     }
 
     private void AimTowardsMouse()
@@ -67,7 +69,7 @@ public class PlayerMovement : MonoBehaviour
         ApplyGravity();
         if (movementDirection.magnitude > 0)
         {
-            characterController.Move(movementDirection * Time.deltaTime * walkSpeed);
+            characterController.Move(movementDirection * Time.deltaTime * speed);
         }
     }
 
@@ -83,14 +85,26 @@ public class PlayerMovement : MonoBehaviour
             verticalVelocity = -.5f;
         }
     }
+    private void AssignInputEvents()
+    {
+        controls = player.controls;
 
-    private void OnEnable()
-    {
-        controls.Enable();
-    }
-    private void OnDisable()
-    {
-        controls.Disable();
+        controls.Character.Movement.performed += ctx => moveInput = ctx.ReadValue<Vector2>();
+        controls.Character.Movement.canceled += ctx => moveInput = Vector2.zero;
+
+        controls.Character.Aim.performed += ctx => aimInput = ctx.ReadValue<Vector2>();
+        controls.Character.Aim.canceled += ctx => aimInput = Vector2.zero;
+
+        controls.Character.Run.performed += ctx =>
+        {
+            speed = runSpeed;
+            isRunning = true;
+        };
+        controls.Character.Run.canceled += ctx =>
+        {
+            isRunning = false;
+            speed = walkSpeed;
+        };
     }
 
 }
