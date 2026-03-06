@@ -103,10 +103,20 @@ public class PlayerMovement : MonoBehaviour
             new Vector3(Screen.width / 2f, Screen.height / 2f)
         );
 
+        Vector3 targetPoint;
+
+        // Nếu raycast trúng object
         if (Physics.Raycast(ray, out RaycastHit hit, 100f, aimLayerMask))
         {
-            aim.position = hit.point;
+            targetPoint = hit.point;
         }
+        // Nếu không trúng gì
+        else
+        {
+            targetPoint = ray.origin + ray.direction * 100f;
+        }
+
+        aim.position = targetPoint;
     }
 
     private void ApplyGravity()
