@@ -11,17 +11,26 @@ public class PlayerMovement : MonoBehaviour
     [Header("Movement")]
     [SerializeField] private float walkSpeed = 3f;
     [SerializeField] private float runSpeed = 6f;
-    [SerializeField] private float rotationSpeed = 15f;
+    [SerializeField] private float rotationSpeed = 12f;
+
+    [Header("Gravity")]
+    [SerializeField] private float gravity = -9.81f;
 
     [Header("Aim")]
     [SerializeField] private Transform aim;
+    [SerializeField] private float aimSmoothTime = 0.05f;
     [SerializeField] private LayerMask aimLayerMask;
 
-    private float speed;
     private Vector2 moveInput;
+    private float speed;
+    private float verticalVelocity;
+
     private bool isRunning;
     private bool isAiming;
-    private float verticalVelocity;
+
+    private Camera cam;
+
+    private Vector3 aimVelocity;
 
     private void Start()
     {
@@ -29,32 +38,61 @@ public class PlayerMovement : MonoBehaviour
         characterController = GetComponent<CharacterController>();
         animator = GetComponentInChildren<Animator>();
 
+        cam = Camera.main;
+
         speed = walkSpeed;
+
         AssignInputEvents();
+
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
 
     private void Update()
     {
+        HandleAim();
         HandleMovement();
         HandleRotation();
-        HandleAimRaycast();
+        ApplyGravity();
         UpdateAnimator();
-        if (Keyboard.current.escapeKey.wasPressedThisFrame)
-        {
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
-        }
     }
 
     // =========================
-    // MOVE THEO CAMERA
+    // AIM SYSTEM
+    // =========================
+    private void HandleAim()
+    {
+        Ray ray = cam.ScreenPointToRay(
+            new Vector3(Screen.width / 2f, Screen.height / 2f)
+        );
+
+        Vector3 targetPoint;
+
+        if (Physics.Raycast(ray, out RaycastHit hit, 100f, aimLayerMask))
+        {
+            targetPoint = hit.point;
+        }
+        else
+        {
+            // fallback nếu ray không trúng collider
+            targetPoint = ray.GetPoint(20f);
+        }
+
+        aim.position = Vector3.SmoothDamp(
+            aim.position,
+            targetPoint,
+            ref aimVelocity,
+            aimSmoothTime
+        );
+    }
+
+    // =========================
+    // MOVEMENT
     // =========================
     private void HandleMovement()
     {
-        Vector3 camForward = Camera.main.transform.forward;
-        Vector3 camRight = Camera.main.transform.right;
+        Vector3 camForward = cam.transform.forward;
+        Vector3 camRight = cam.transform.right;
 
         camForward.y = 0;
         camRight.y = 0;
@@ -62,75 +100,56 @@ public class PlayerMovement : MonoBehaviour
         camForward.Normalize();
         camRight.Normalize();
 
-        Vector3 moveDir = camForward * moveInput.y +
-                          camRight * moveInput.x;
+        Vector3 move =
+            camForward * moveInput.y +
+            camRight * moveInput.x;
 
-        if (moveDir.magnitude > 0)
-        {
-            characterController.Move(moveDir * speed * Time.deltaTime);
-        }
+        move = Vector3.ClampMagnitude(move, 1f);
 
-        ApplyGravity();
+        characterController.Move(move * speed * Time.deltaTime);
     }
 
     // =========================
-    // XOAY PLAYER THEO CAMERA (KHI AIM)
+    // ROTATION
     // =========================
     private void HandleRotation()
     {
         if (!isAiming) return;
 
-        Vector3 camForward = Camera.main.transform.forward;
-        camForward.y = 0;
+        Vector3 direction = aim.position - transform.position;
+        direction.y = 0;
 
-        if (camForward.sqrMagnitude < 0.01f) return;
+        if (direction.magnitude < 0.5f) return;
 
-        Quaternion targetRot = Quaternion.LookRotation(camForward);
+        Quaternion targetRotation = Quaternion.LookRotation(direction);
 
-        transform.rotation = Quaternion.Lerp(
+        transform.rotation = Quaternion.Slerp(
             transform.rotation,
-            targetRot,
+            targetRotation,
             rotationSpeed * Time.deltaTime
         );
     }
 
     // =========================
-    // RAYCAST TỪ TÂM MÀN HÌNH
+    // GRAVITY
     // =========================
-    private void HandleAimRaycast()
-    {
-        Ray ray = Camera.main.ScreenPointToRay(
-            new Vector3(Screen.width / 2f, Screen.height / 2f)
-        );
-
-        Vector3 targetPoint;
-
-        // Nếu raycast trúng object
-        if (Physics.Raycast(ray, out RaycastHit hit, 100f, aimLayerMask))
-        {
-            targetPoint = hit.point;
-        }
-        // Nếu không trúng gì
-        else
-        {
-            targetPoint = ray.origin + ray.direction * 100f;
-        }
-
-        aim.position = targetPoint;
-    }
-
     private void ApplyGravity()
     {
-        if (!characterController.isGrounded)
-            verticalVelocity -= 9.81f * Time.deltaTime;
-        else
-            verticalVelocity = -1f;
+        if (characterController.isGrounded && verticalVelocity < 0)
+        {
+            verticalVelocity = -2f;
+        }
+
+        verticalVelocity += gravity * Time.deltaTime;
 
         characterController.Move(
             Vector3.up * verticalVelocity * Time.deltaTime
         );
     }
 
+    // =========================
+    // ANIMATOR
+    // =========================
     private void UpdateAnimator()
     {
         animator.SetFloat("xVelocity", moveInput.x, 0.1f, Time.deltaTime);
@@ -138,6 +157,9 @@ public class PlayerMovement : MonoBehaviour
         animator.SetBool("isRunning", isRunning);
     }
 
+    // =========================
+    // INPUT
+    // =========================
     private void AssignInputEvents()
     {
         controls = player.controls;

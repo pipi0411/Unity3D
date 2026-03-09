@@ -41,6 +41,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 687871091605226920}
     m_Modifications:
+    - target: {fileID: 1420991482473041389, guid: 4d87e7821b707be41bd0183292489260, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
     - target: {fileID: 3251899308924891225, guid: 4d87e7821b707be41bd0183292489260, type: 3}
       propertyPath: m_LocalPosition.x
       value: -5.8764114
@@ -81,9 +85,21 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3670789211771804260, guid: 4d87e7821b707be41bd0183292489260, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
     - target: {fileID: 5602980151606783194, guid: 4d87e7821b707be41bd0183292489260, type: 3}
       propertyPath: m_Name
       value: Room 1 (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 7573341272200577915, guid: 4d87e7821b707be41bd0183292489260, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 8078432011513957085, guid: 4d87e7821b707be41bd0183292489260, type: 3}
+      propertyPath: m_Layer
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 8253446046380700420, guid: 4d87e7821b707be41bd0183292489260, type: 3}
       propertyPath: 'walls.Array.data[0]'
@@ -123,6 +139,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 687871091605226920}
     m_Modifications:
+    - target: {fileID: 1420991482473041389, guid: 4d87e7821b707be41bd0183292489260, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
     - target: {fileID: 3251899308924891225, guid: 4d87e7821b707be41bd0183292489260, type: 3}
       propertyPath: m_LocalPosition.x
       value: -11.590008
@@ -163,9 +183,21 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3670789211771804260, guid: 4d87e7821b707be41bd0183292489260, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
     - target: {fileID: 5602980151606783194, guid: 4d87e7821b707be41bd0183292489260, type: 3}
       propertyPath: m_Name
       value: Room 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7573341272200577915, guid: 4d87e7821b707be41bd0183292489260, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 8078432011513957085, guid: 4d87e7821b707be41bd0183292489260, type: 3}
+      propertyPath: m_Layer
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 8253446046380700420, guid: 4d87e7821b707be41bd0183292489260, type: 3}
       propertyPath: 'walls.Array.data[0]'
