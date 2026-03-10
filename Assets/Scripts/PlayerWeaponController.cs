@@ -1,8 +1,13 @@
+using System;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerWeaponController : MonoBehaviour
 {
     private Player player;
+    [SerializeField] private GameObject bulletPrefab;
+    [SerializeField] private float bulletSpeed;
+    [SerializeField] private Transform gunPoint;
     private void Start()
     {
         player = GetComponent<Player>();
@@ -10,7 +15,9 @@ public class PlayerWeaponController : MonoBehaviour
     }
     private void Shoot()
     {
-        Debug.Log("Pew Pew");
+        GameObject newBullet = Instantiate(bulletPrefab, gunPoint.position, Quaternion.LookRotation(gunPoint.forward));
+        newBullet.GetComponent<Rigidbody>().linearVelocity = gunPoint.forward * bulletSpeed;
+        Destroy(newBullet, .75f);
         var animator = GetComponentInChildren<Animator>();
         animator.SetTrigger("Fire");
     }
