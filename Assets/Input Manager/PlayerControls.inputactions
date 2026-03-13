@@ -43,10 +43,28 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Look",
-                    "type": "PassThrough",
-                    "id": "eeaef9cd-ee9b-4233-ada8-7909681e341b",
-                    "expectedControlType": "Vector2",
+                    "name": "Equip Slot - 1",
+                    "type": "Button",
+                    "id": "c0e3f59a-04aa-476b-b2d1-e3d36849b591",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Equip Slot - 2",
+                    "type": "Button",
+                    "id": "1c7d4936-afa0-4dca-8d64-d5d889fe4e26",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Drop Current Weapon",
+                    "type": "Button",
+                    "id": "ca91e60e-02f8-4de4-b0aa-46bbc9ccaac1",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
@@ -143,23 +161,34 @@
                 },
                 {
                     "name": "",
-                    "id": "3a84fb78-d83e-4543-a249-f41314fc767c",
-                    "path": "<Gamepad>/rightStick",
+                    "id": "6eb0636f-a1f1-403b-afa6-a2085cb147a5",
+                    "path": "<Keyboard>/1",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Look",
+                    "action": "Equip Slot - 1",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
                     "name": "",
-                    "id": "bbe108d6-a786-4bd8-aacc-30f1a1e8b789",
-                    "path": "<Pointer>/delta",
+                    "id": "4d11913b-6cae-41fe-88b2-4f95482e6ac1",
+                    "path": "<Keyboard>/2",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Look",
+                    "action": "Equip Slot - 2",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "67a1d10c-dcf5-4cd1-beb6-44d6d54bf872",
+                    "path": "<Keyboard>/g",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Drop Current Weapon",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

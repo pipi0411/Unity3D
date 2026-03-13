@@ -43,17 +43,38 @@ public class PlayerMovement : MonoBehaviour
         AssignInputEvents();
 
         // Khóa chuột để POV của Cinemachine hoạt động chuẩn
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+        SetCursorLocked(true);
     }
 
     private void Update()
     {
+        HandleCursorToggle();
         HandleAim();
         HandleMovement();
         HandleRotation();
         ApplyGravity();
         UpdateAnimator();
+    }
+
+    private void HandleCursorToggle()
+    {
+        var keyboard = Keyboard.current;
+        if (keyboard == null)
+        {
+            return;
+        }
+
+        if (keyboard.leftAltKey.wasPressedThisFrame || keyboard.rightAltKey.wasPressedThisFrame)
+        {
+            bool shouldUnlock = Cursor.lockState == CursorLockMode.Locked;
+            SetCursorLocked(!shouldUnlock);
+        }
+    }
+
+    private void SetCursorLocked(bool locked)
+    {
+        Cursor.lockState = locked ? CursorLockMode.Locked : CursorLockMode.None;
+        Cursor.visible = !locked;
     }
 
     private void HandleAim()
