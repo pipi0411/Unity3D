@@ -68,17 +68,10 @@ public class PlayerWeaponController : MonoBehaviour
 
     private void Shoot()
     {
-        if (currentWeapon == null)
+        if (currentWeapon.CanShoot() == false)
         {
             return;
         }
-
-        if (currentWeapon.ammo <= 0)
-        {
-            return;
-        }
-
-        currentWeapon.ammo--;
 
         if (bulletPrefab == null || gunPoint == null)
         {
