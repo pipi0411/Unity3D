@@ -11,16 +11,40 @@ public class PlayerWeaponController : MonoBehaviour
     [Header("Bullet Settings")]
     [SerializeField] private GameObject bulletPrefab;
     [SerializeField] private float bulletSpeed;
+    [SerializeField, Min(0f)] private float muzzleOffset = 0.2f;
     [SerializeField] private Transform gunPoint;
     [Header("Inventory")]
     [SerializeField] private int maxWeaponSlots = 2; // Giới hạn số lượng vũ khí có thể mang theo
     [SerializeField] private List<Weapon> weaponSlots;
+
     private void Start()
     {
         player = GetComponent<Player>();
+        InitializeWeapons();
         AssignInputEvents();
 
         Invoke(nameof(EquipStartingWeapon), .1f);
+    }
+
+    private void InitializeWeapons()
+    {
+        for (int i = 0; i < weaponSlots.Count; i++)
+        {
+            if (weaponSlots[i] == null)
+            {
+                continue;
+            }
+
+            Weapon runtimeWeapon = weaponSlots[i].CreateRuntimeCopy();
+            runtimeWeapon.InitializeFromDataIfNeeded();
+            weaponSlots[i] = runtimeWeapon;
+        }
+
+        if (currentWeapon != null)
+        {
+            currentWeapon = currentWeapon.CreateRuntimeCopy();
+            currentWeapon.InitializeFromDataIfNeeded();
+        }
     }
     private void Update()
     {
@@ -60,18 +84,29 @@ public class PlayerWeaponController : MonoBehaviour
             return;
         }
 
+        weaponSlots[i].InitializeFromDataIfNeeded();
         currentWeapon = weaponSlots[i];
         player.weaponVisualController.PlayWeaponEquipAnimation();
     }
-    public void PickupWeapon(Weapon newWeapon)
+
+    public bool PickupWeapon(Weapon newWeapon)
     {
+        if (newWeapon == null)
+        {
+            return false;
+        }
+
         if (weaponSlots.Count >= maxWeaponSlots)
         {
             Debug.Log("Inventory full! Cannot pick up ");
-            return; // Không thể nhặt thêm vũ khí nếu đã đầy
+            return false; // Không thể nhặt thêm vũ khí nếu đã đầy
         }
-        weaponSlots.Add(newWeapon);
+
+        Weapon runtimeWeapon = newWeapon.CreateRuntimeCopy();
+        runtimeWeapon.InitializeFromDataIfNeeded();
+        weaponSlots.Add(runtimeWeapon);
         player.weaponVisualController.SwitchOnBackupWeaponModel();
+        return true;
     }
     private void DropWeapon()
     {
@@ -112,18 +147,59 @@ public class PlayerWeaponController : MonoBehaviour
             isShooting = false; // Đặt lại trạng thái bắn cho súng bắn từng viên
         }
 
+        FireCurrentWeaponProjectiles();
+
+        var animator = GetComponentInChildren<Animator>();
+        animator?.SetTrigger("Fire");
+    }
+
+    private void FireCurrentWeaponProjectiles()
+    {
+        int projectileCount = Mathf.Max(1, currentWeapon.projectilesPerShot);
+
+        for (int i = 0; i < projectileCount; i++)
+        {
+            Vector3 shootDirection = GetSpreadDirection(i, projectileCount, currentWeapon.spreadAngle);
+            SpawnBullet(shootDirection);
+        }
+    }
+
+    private Vector3 GetSpreadDirection(int projectileIndex, int projectileCount, float maxSpreadAngle)
+    {
+        if (projectileCount <= 1 || maxSpreadAngle <= 0f)
+        {
+            return gunPoint.forward;
+        }
+
+        float lerp = projectileIndex / (projectileCount - 1f);
+        float yawAngle = Mathf.Lerp(-maxSpreadAngle, maxSpreadAngle, lerp);
+        Quaternion spreadRotation = Quaternion.Euler(0f, yawAngle, 0f);
+        return spreadRotation * gunPoint.forward;
+    }
+
+    private void SpawnBullet(Vector3 shootDirection)
+    {
         GameObject newBullet = ObjectPool.Instance.GetBullet();
-        newBullet.transform.position = gunPoint.position;
-        newBullet.transform.rotation = Quaternion.LookRotation(gunPoint.forward);
+        if (newBullet == null)
+        {
+            return;
+        }
+
+        Bullet bulletComponent = newBullet.GetComponent<Bullet>();
+        if (bulletComponent != null)
+        {
+            bulletComponent.SetDamage(currentWeapon.damage);
+        }
+
+        newBullet.transform.position = gunPoint.position + shootDirection * muzzleOffset;
+        newBullet.transform.rotation = Quaternion.LookRotation(shootDirection);
 
         Rigidbody rbNewBullet = newBullet.GetComponent<Rigidbody>();
         if (rbNewBullet != null)
         {
-            rbNewBullet.linearVelocity = gunPoint.forward * bulletSpeed;
+            rbNewBullet.useGravity = false;
+            rbNewBullet.linearVelocity = shootDirection * bulletSpeed;
         }
-
-        var animator = GetComponentInChildren<Animator>();
-        animator?.SetTrigger("Fire");
     }
 
     public void OnReloadFinished()

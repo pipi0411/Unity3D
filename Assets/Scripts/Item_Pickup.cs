@@ -3,8 +3,20 @@ using UnityEngine;
 public class Item_Pickup : MonoBehaviour
 {
     [SerializeField] private Weapon weapon; // Vũ khí mà người chơi sẽ nhặt được
+    [SerializeField] private GameObject objectToRemoveOnPickup;
+
     private void OnTriggerEnter(Collider other)
     {
-        other.GetComponent<PlayerWeaponController>()?.PickupWeapon(weapon);
+        PlayerWeaponController playerWeaponController = other.GetComponent<PlayerWeaponController>();
+        if (playerWeaponController == null)
+        {
+            return;
+        }
+
+        bool pickedUpSuccessfully = playerWeaponController.PickupWeapon(weapon);
+        if (pickedUpSuccessfully)
+        {
+            Destroy(objectToRemoveOnPickup != null ? objectToRemoveOnPickup : gameObject);
+        }
     }
 }
