@@ -6,7 +6,7 @@ AnimationClip:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: '@Weapon Grab - Side(Not Read - Only)'
+  m_Name: '@Weapon Equip - Side(Not Read - Only)'
   serializedVersion: 7
   m_Legacy: 0
   m_Compressed: 0
@@ -39585,6 +39585,13 @@ AnimationClip:
   m_HasGenericRootTransform: 0
   m_HasMotionFloatCurves: 0
   m_Events:
+  - time: 0.73333335
+    functionName: SwitchOnWeaponModel
+    data: 
+    objectReferenceParameter: {fileID: 0}
+    floatParameter: 0
+    intParameter: 0
+    messageOptions: 0
   - time: 1
     functionName: ReturnRig
     data: 
