@@ -21,6 +21,6 @@ MonoBehaviour:
   damage: 15
   magazineCapacity: 15
   startBulletsInMagazine: 15
-  startReserveAmmo: 2147483647
+  startReserveAmmo: 999999
   reloadSpeed: 1.2
   equipementSpeed: 1.5

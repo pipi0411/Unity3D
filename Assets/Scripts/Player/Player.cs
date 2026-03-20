@@ -6,6 +6,8 @@ public class Player : MonoBehaviour
     public PlayerMovement movement { get; private set; }
     public PlayerWeaponController weaponController { get; private set; }
     public WeaponVisualController weaponVisualController { get; private set; }
+    public PlayerHealth health { get; private set; }
+    public PlayerCoins coins { get; private set; }
 
     private void Awake()
     {
@@ -13,6 +15,13 @@ public class Player : MonoBehaviour
         movement = GetComponent<PlayerMovement>();
         weaponController = GetComponent<PlayerWeaponController>();
         weaponVisualController = GetComponentInChildren<WeaponVisualController>();
+        health = GetComponent<PlayerHealth>();
+        coins = GetComponent<PlayerCoins>();
+
+        if (coins == null)
+        {
+            coins = gameObject.AddComponent<PlayerCoins>();
+        }
     }
     private void OnEnable()
     {

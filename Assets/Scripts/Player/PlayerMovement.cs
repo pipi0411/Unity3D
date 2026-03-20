@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Cinemachine;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -21,15 +22,27 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float aimSmoothTime = 0.05f;
     [SerializeField] private LayerMask aimLayerMask;
 
+    [Header("Zoom")]
+    [SerializeField] private bool enableZoom = true;
+    [SerializeField] private float zoomFov = 45f;
+    [SerializeField] private float zoomSmoothSpeed = 10f;
+
     private Vector2 moveInput;
     private float speed;
     private float verticalVelocity;
 
     private bool isRunning;
     private bool isAiming;
+    private bool isZooming;
+
+    public bool IsAiming => isAiming;
 
     private Camera cam;
+    private CinemachineBrain cinemachineBrain;
+    private CinemachineVirtualCamera activeVirtualCamera;
     private Vector3 aimVelocity;
+    private float defaultFov;
+    private bool hasDefaultFov;
 
     private void Start()
     {
@@ -38,6 +51,7 @@ public class PlayerMovement : MonoBehaviour
         animator = GetComponentInChildren<Animator>();
 
         cam = Camera.main;
+        CacheZoomSource();
         speed = walkSpeed;
 
         AssignInputEvents();
@@ -49,6 +63,7 @@ public class PlayerMovement : MonoBehaviour
     private void Update()
     {
         HandleCursorToggle();
+        HandleZoom();
         HandleAim();
         HandleMovement();
         HandleRotation();
@@ -75,6 +90,100 @@ public class PlayerMovement : MonoBehaviour
     {
         Cursor.lockState = locked ? CursorLockMode.Locked : CursorLockMode.None;
         Cursor.visible = !locked;
+    }
+
+    private void HandleZoom()
+    {
+        if (!enableZoom)
+        {
+            return;
+        }
+
+        if (controls != null)
+        {
+            isZooming = controls.Character.Zoom.IsPressed();
+        }
+
+        if (!hasDefaultFov)
+        {
+            CacheZoomSource();
+        }
+
+        if (!hasDefaultFov)
+        {
+            return;
+        }
+
+        float targetFov = isZooming ? Mathf.Clamp(zoomFov, 1f, defaultFov) : defaultFov;
+        float smooth = Mathf.Max(0f, zoomSmoothSpeed) * Time.deltaTime;
+
+        if (TryGetActiveVirtualCamera(out CinemachineVirtualCamera virtualCamera))
+        {
+            if (activeVirtualCamera != virtualCamera)
+            {
+                activeVirtualCamera = virtualCamera;
+                defaultFov = activeVirtualCamera.m_Lens.FieldOfView;
+                targetFov = isZooming ? Mathf.Clamp(zoomFov, 1f, defaultFov) : defaultFov;
+            }
+
+            LensSettings lens = activeVirtualCamera.m_Lens;
+            lens.FieldOfView = Mathf.Lerp(lens.FieldOfView, targetFov, smooth);
+            activeVirtualCamera.m_Lens = lens;
+            return;
+        }
+
+        if (cam != null)
+        {
+            cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, targetFov, smooth);
+        }
+    }
+
+    private void CacheZoomSource()
+    {
+        if (cam == null)
+        {
+            cam = Camera.main;
+        }
+
+        if (TryGetActiveVirtualCamera(out CinemachineVirtualCamera virtualCamera))
+        {
+            activeVirtualCamera = virtualCamera;
+            defaultFov = activeVirtualCamera.m_Lens.FieldOfView;
+            hasDefaultFov = true;
+            return;
+        }
+
+        if (cam != null)
+        {
+            defaultFov = cam.fieldOfView;
+            hasDefaultFov = true;
+        }
+    }
+
+    private bool TryGetActiveVirtualCamera(out CinemachineVirtualCamera virtualCamera)
+    {
+        virtualCamera = null;
+
+        if (cinemachineBrain == null)
+        {
+            if (cam != null)
+            {
+                cinemachineBrain = cam.GetComponent<CinemachineBrain>();
+            }
+
+            if (cinemachineBrain == null)
+            {
+                cinemachineBrain = FindAnyObjectByType<CinemachineBrain>();
+            }
+        }
+
+        if (cinemachineBrain == null)
+        {
+            return false;
+        }
+
+        virtualCamera = cinemachineBrain.ActiveVirtualCamera as CinemachineVirtualCamera;
+        return virtualCamera != null;
     }
 
     private void HandleAim()
