@@ -1,98 +1,156 @@
 using UnityEngine;
+using UnityEngine.AI;
 
 public class SkeletonMovement : MonoBehaviour
 {
-    [Header("Patrol Settings")]
-    [SerializeField] private Transform[] patrolPoints;      // Các điểm patrol (kéo PatrolRoute children vào đây)
+    [Header("Cấu hình di chuyển")]
+    [SerializeField] private float wanderRadius = 40f;
+    [SerializeField] private float detectionRange = 10f;
     [SerializeField] private float patrolSpeed = 2f;
+    [SerializeField] private float chaseSpeed = 4f;
+    [SerializeField] private string playerTag = "Player";
+    [SerializeField] private float playerSearchInterval = 1f;
+    [SerializeField] private float navMeshSnapDistance = 2f;
 
-    [Header("Chase Settings")]
-    [SerializeField] private Transform player;              // Kéo Player GameObject vào đây trong Inspector
-    [SerializeField] private float chaseSpeed = 4f;         // Nhanh hơn patrol
-    [SerializeField] private float detectionRange = 10f;    // Khoảng cách phát hiện player (tăng/giảm tùy ý)
-    [SerializeField] private float attackRange = 1.5f;      // Khi gần thế này thì dừng lại tấn công (nếu có)
-
-    private int currentPointIndex = 0;
+    private NavMeshAgent agent;
     private Animator animator;
-    private float currentSpeed;
+    private Transform player;
+    private NavMeshPath cachedPath;
+    private float nextPlayerSearchTime;
 
     void Start()
     {
-        animator = GetComponent<Animator>(); // Hoặc GetComponentInChildren nếu Animator ở child (như Root_M)
-        if (player == null)
+        agent = GetComponent<NavMeshAgent>();
+        animator = GetComponent<Animator>();
+
+        if (agent == null)
         {
-            player = GameObject.FindGameObjectWithTag("Player")?.transform; // Tự tìm nếu chưa kéo
-            if (player == null) Debug.LogWarning("Không tìm thấy Player! Tag Player phải là 'Player'");
+            Debug.LogError("SkeletonMovement requires a NavMeshAgent component.", this);
+            enabled = false;
+            return;
         }
+
+        cachedPath = new NavMeshPath();
+
+        TryFindPlayer(force: true);
+
+        agent.stoppingDistance = 1.0f;
+        agent.acceleration = 8f;
+
+        TrySnapToNavMesh();
+        SetRandomDestination();
     }
 
     void Update()
     {
-        if (player == null) return;
+        if (agent == null) return;
 
-        float distanceToPlayer = Vector3.Distance(transform.position, player.position);
+        if (!agent.isOnNavMesh && !TrySnapToNavMesh()) return;
+
+        TryFindPlayer();
+
+        float distanceToPlayer = player != null ? Vector3.Distance(transform.position, player.position) : float.MaxValue;
 
         if (distanceToPlayer <= detectionRange)
         {
-            // Chase mode
             ChasePlayer();
-            currentSpeed = chaseSpeed;
-
-            // Nếu có animation Run
-            if (animator != null) animator.SetFloat("Speed", 1f); // Giả sử "Speed" >0 là run
         }
         else
         {
-            // Patrol mode
-            if (patrolPoints.Length > 0)
-            {
-                Patrol();
-                currentSpeed = patrolSpeed;
-                if (animator != null) animator.SetFloat("Speed", 0.5f); // Walk chậm
-            }
+            Wander();
         }
+
+        UpdateAnimation();
     }
 
     void ChasePlayer()
     {
-        Vector3 direction = (player.position - transform.position).normalized;
+        if (player == null || !agent.isOnNavMesh) return;
 
-        // Di chuyển
-        transform.position += direction * chaseSpeed * Time.deltaTime;
+        agent.speed = chaseSpeed;
+        agent.SetDestination(player.position);
+    }
 
-        // Xoay về player
-        if (direction != Vector3.zero)
+    void Wander()
+    {
+        if (!agent.isOnNavMesh) return;
+
+        agent.speed = patrolSpeed;
+
+        bool needsNewDestination = !agent.pathPending &&
+                                   (!agent.hasPath ||
+                                    agent.pathStatus != NavMeshPathStatus.PathComplete ||
+                                    agent.remainingDistance <= Mathf.Max(agent.stoppingDistance + 0.2f, 0.5f));
+
+        if (needsNewDestination)
         {
-            Quaternion targetRotation = Quaternion.LookRotation(direction);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, 8f * Time.deltaTime);
-        }
-
-        // Nếu gần quá → có thể trigger attack (thêm sau nếu cần)
-        if (Vector3.Distance(transform.position, player.position) <= attackRange)
-        {
-            // Ví dụ: animator.SetTrigger("Attack");
-            // Hoặc gọi hàm damage player
+            SetRandomDestination();
         }
     }
 
-    void Patrol()
+    void SetRandomDestination()
     {
-        if (patrolPoints.Length == 0) return;
+        if (!agent.isOnNavMesh) return;
 
-        Transform target = patrolPoints[currentPointIndex];
-        Vector3 direction = (target.position - transform.position).normalized;
+        Vector3 finalPosition = Vector3.zero;
+        bool foundPoint = false;
+        Vector3 currentPosition = transform.position;
 
-        transform.position += direction * patrolSpeed * Time.deltaTime;
-
-        if (direction != Vector3.zero)
+        // Chọn điểm trên mặt phẳng XZ để tránh chọn điểm cao/thấp gây lỗi path.
+        for (int i = 0; i < 20; i++)
         {
-            Quaternion targetRotation = Quaternion.LookRotation(direction);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, 5f * Time.deltaTime);
+            Vector2 randomCircle = Random.insideUnitCircle * wanderRadius;
+            Vector3 randomDirection = currentPosition + new Vector3(randomCircle.x, 0f, randomCircle.y);
+
+            NavMeshHit hit;
+            if (NavMesh.SamplePosition(randomDirection, out hit, navMeshSnapDistance, NavMesh.AllAreas))
+            {
+                if (agent.CalculatePath(hit.position, cachedPath) && cachedPath.status == NavMeshPathStatus.PathComplete)
+                {
+                    finalPosition = hit.position;
+                    foundPoint = true;
+                    break;
+                }
+            }
         }
 
-        if (Vector3.Distance(transform.position, target.position) < 0.5f)
+        if (foundPoint)
         {
-            currentPointIndex = (currentPointIndex + 1) % patrolPoints.Length;
+            agent.SetDestination(finalPosition);
         }
+    }
+
+    void UpdateAnimation()
+    {
+        if (animator != null)
+        {
+            float speedPercent = agent.velocity.magnitude / chaseSpeed;
+            animator.SetFloat("Speed", speedPercent);
+        }
+    }
+
+    bool TryFindPlayer(bool force = false)
+    {
+        if (!force && Time.time < nextPlayerSearchTime) return player != null;
+
+        nextPlayerSearchTime = Time.time + Mathf.Max(0.2f, playerSearchInterval);
+
+        GameObject playerObj = GameObject.FindGameObjectWithTag(playerTag);
+        player = playerObj != null ? playerObj.transform : null;
+
+        return player != null;
+    }
+
+    bool TrySnapToNavMesh()
+    {
+        if (agent.isOnNavMesh) return true;
+
+        NavMeshHit hit;
+        if (NavMesh.SamplePosition(transform.position, out hit, navMeshSnapDistance, NavMesh.AllAreas))
+        {
+            return agent.Warp(hit.position);
+        }
+
+        return false;
     }
 }
