@@ -13,11 +13,13 @@ public class SettingsPanelUI : MonoBehaviour
     [SerializeField] private Slider mouseSensitivitySlider;
     [SerializeField] private Slider masterVolumeSlider;
     [SerializeField] private TMP_Dropdown resolutionDropdown;
+    [SerializeField] private Toggle fullscreenToggle;
     [SerializeField] private TMP_Text mouseSensitivityValueText;
     [SerializeField] private TMP_Text masterVolumeValueText;
 
     private readonly List<Vector2Int> resolutionOptions = new List<Vector2Int>();
     private bool isInitializing;
+    private const float AspectTolerance = 0.02f;
 
     private void Awake()
     {
@@ -51,6 +53,11 @@ public class SettingsPanelUI : MonoBehaviour
         if (resolutionDropdown != null)
         {
             resolutionDropdown.onValueChanged.RemoveListener(OnResolutionChanged);
+        }
+
+        if (fullscreenToggle != null)
+        {
+            fullscreenToggle.onValueChanged.RemoveListener(OnFullscreenToggleChanged);
         }
     }
 
@@ -101,6 +108,12 @@ public class SettingsPanelUI : MonoBehaviour
             resolutionDropdown.onValueChanged.RemoveListener(OnResolutionChanged);
             resolutionDropdown.onValueChanged.AddListener(OnResolutionChanged);
         }
+
+        if (fullscreenToggle != null)
+        {
+            fullscreenToggle.onValueChanged.RemoveListener(OnFullscreenToggleChanged);
+            fullscreenToggle.onValueChanged.AddListener(OnFullscreenToggleChanged);
+        }
     }
 
     private void LoadSettingsToUI()
@@ -122,6 +135,11 @@ public class SettingsPanelUI : MonoBehaviour
             int selectedIndex = FindCurrentResolutionIndex();
             resolutionDropdown.SetValueWithoutNotify(selectedIndex);
             resolutionDropdown.RefreshShownValue();
+        }
+
+        if (fullscreenToggle != null)
+        {
+            fullscreenToggle.SetIsOnWithoutNotify(GameSettings.IsFullscreen);
         }
 
         RefreshValueTexts();
@@ -156,11 +174,18 @@ public class SettingsPanelUI : MonoBehaviour
 
         Resolution[] allResolutions = Screen.resolutions;
         var optionLabels = new List<string>();
+        float targetAspect = (float)Screen.currentResolution.width / Screen.currentResolution.height;
 
         for (int i = 0; i < allResolutions.Length; i++)
         {
             Vector2Int current = new Vector2Int(allResolutions[i].width, allResolutions[i].height);
             if (resolutionOptions.Contains(current))
+            {
+                continue;
+            }
+
+            float currentAspect = (float)current.x / current.y;
+            if (Mathf.Abs(currentAspect - targetAspect) > AspectTolerance)
             {
                 continue;
             }
@@ -171,12 +196,24 @@ public class SettingsPanelUI : MonoBehaviour
 
         if (resolutionOptions.Count == 0)
         {
-            Vector2Int fallback = new Vector2Int(Screen.currentResolution.width, Screen.currentResolution.height);
-            resolutionOptions.Add(fallback);
-            optionLabels.Add(fallback.x + " x " + fallback.y);
+            AddFallbackResolution(optionLabels, 1280, 720);
+            AddFallbackResolution(optionLabels, 1600, 900);
+            AddFallbackResolution(optionLabels, 1920, 1080);
         }
 
         resolutionDropdown.AddOptions(optionLabels);
+    }
+
+    private void AddFallbackResolution(List<string> labels, int width, int height)
+    {
+        Vector2Int fallback = new Vector2Int(width, height);
+        if (resolutionOptions.Contains(fallback))
+        {
+            return;
+        }
+
+        resolutionOptions.Add(fallback);
+        labels.Add(fallback.x + " x " + fallback.y);
     }
 
     private int FindCurrentResolutionIndex()
@@ -239,5 +276,15 @@ public class SettingsPanelUI : MonoBehaviour
 
         Vector2Int selected = resolutionOptions[index];
         GameSettings.SetResolution(selected.x, selected.y);
+    }
+
+    private void OnFullscreenToggleChanged(bool isOn)
+    {
+        if (isInitializing)
+        {
+            return;
+        }
+
+        GameSettings.SetFullscreen(isOn);
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerHealth : MonoBehaviour, IDamageable
 {
@@ -11,6 +12,10 @@ public class PlayerHealth : MonoBehaviour, IDamageable
     [SerializeField] private bool enableAutoRegen = true;
     [SerializeField] private float minNoDamageTime = 5f;
     [SerializeField] private float maxNoDamageTime = 10f;
+
+    [Header("Lose Scene")]
+    [SerializeField] private bool loadSceneOnDeath = true;
+    [SerializeField] private string lostSceneName = "LostGame";
 
     private float currentHealth;
     private bool isDead;
@@ -127,6 +132,19 @@ public class PlayerHealth : MonoBehaviour, IDamageable
 
         isDead = true;
         OnDeath?.Invoke();
+
+        if (loadSceneOnDeath)
+        {
+            Time.timeScale = 1f;
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+
+            if (!string.IsNullOrWhiteSpace(lostSceneName) && Application.CanStreamedLevelBeLoaded(lostSceneName))
+            {
+                SceneManager.LoadScene(lostSceneName);
+                return;
+            }
+        }
 
         if (destroyOnDeath)
         {

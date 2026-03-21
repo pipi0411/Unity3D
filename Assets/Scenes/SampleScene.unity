@@ -152,6 +152,8 @@ MonoBehaviour:
   enableAutoRegen: 1
   minNoDamageTime: 5
   maxNoDamageTime: 10
+  loadSceneOnDeath: 1
+  lostSceneName: LostGame
 --- !u!114 &50885162
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -327,7 +329,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!64 &271534249
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -1939,6 +1941,10 @@ PrefabInstance:
       propertyPath: playerCoins
       value: 
       objectReference: {fileID: 50885162}
+    - target: {fileID: 2080683503402560169, guid: f7cd12f915b8c2143885f5737f41d251, type: 3}
+      propertyPath: winSceneName
+      value: WinGame
+      objectReference: {fileID: 0}
     - target: {fileID: 7977769208796770905, guid: f7cd12f915b8c2143885f5737f41d251, type: 3}
       propertyPath: m_LocalPosition.x
       value: 82.77

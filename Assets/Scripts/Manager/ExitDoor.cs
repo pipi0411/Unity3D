@@ -16,9 +16,9 @@ public class ExitDoor : MonoBehaviour
 
     [Header("End Game")]
     [SerializeField] private GameObject winPanel;
-    [SerializeField] private bool pauseGameOnWin = true;
-    [SerializeField] private bool loadSceneOnWin;
-    [SerializeField] private string winSceneName = "MainMenu";
+    [SerializeField] private bool pauseGameOnWin = false;
+    [SerializeField] private bool loadSceneOnWin = true;
+    [SerializeField] private string winSceneName = "WinGame";
 
     private bool isGameEnded;
     private Coroutine messageCoroutine;
