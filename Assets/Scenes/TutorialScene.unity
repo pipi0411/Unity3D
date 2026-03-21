@@ -428,7 +428,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: -1.5, y: 21}
-  m_SizeDelta: {x: 200, y: 50}
+  m_SizeDelta: {x: 300, y: 60}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1609400795
 MonoBehaviour:
@@ -450,10 +450,11 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "W A S D : Di chuy\u1EC3n \nECS = T\u1EA1m d\u1EEBng game\nChu\u1ED9t tr\xE1i
-    = B\u1EAFn\nR = Thay \u0111\u1EA1n\n\nNh\u1EB7t \u0111\u1EE7 s\u1ED1 l\u01B0\u1EE3ng
-    v\u1EADt ph\u1EA9m y\xEAu c\u1EA7u \u0111\u1EC3 c\xF3 th\u1EC3 ho\xE0n th\xE0nh
-    game."
+  m_text: "W A S D : Di chuy\u1EC3n \nECS = T\u1EA1m d\u1EEBng game (c\xF3 Save Game)\nS\u1ED1
+    1 - 2 \u0111\u1ED5i s\xFAng\nChu\u1ED9t tr\xE1i = B\u1EAFn\nChu\u1ED9t ph\u1EA3i
+    = Zoom\nR = Thay \u0111\u1EA1n\n\nNh\u1EB7t \u0111\u1EE7 s\u1ED1 l\u01B0\u1EE3ng
+    Coin y\xEAu c\u1EA7u v\xE0 t\xECm c\u1EEDa tho\xE1t hi\u1EC3m\n \u0111\u1EC3
+    c\xF3 th\u1EC3 ho\xE0n th\xE0nh game."
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -480,8 +481,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 12
-  m_fontSizeBase: 12
+  m_fontSize: 10
+  m_fontSizeBase: 10
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -771,7 +772,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -662, y: 388}
+  m_AnchoredPosition: {x: -805, y: 388}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1977986512

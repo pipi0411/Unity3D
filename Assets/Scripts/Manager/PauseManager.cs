@@ -5,6 +5,9 @@ using UnityEngine.UI;
 public class PauseManager : MonoBehaviour
 {
     [SerializeField] private Button continueButton;
+    [SerializeField] private Button saveButton;
+    [SerializeField] private Button settingButton;
+    [SerializeField] private SettingsPanelUI settingsPanel;
 
     private void Start()
     {
@@ -17,24 +20,49 @@ public class PauseManager : MonoBehaviour
 
         if (continueButton != null)
         {
+            continueButton.onClick.RemoveAllListeners();
             continueButton.onClick.AddListener(ContinueGame);
+        }
+
+        if (saveButton != null)
+        {
+            saveButton.onClick.RemoveAllListeners();
+            saveButton.onClick.AddListener(SaveGame);
+        }
+
+        if (settingButton != null && settingsPanel != null)
+        {
+            settingButton.onClick.RemoveAllListeners();
+            settingButton.onClick.AddListener(settingsPanel.TogglePanel);
         }
     }
 
     public void ContinueGame()
     {
         Time.timeScale = 1f;
+        PauseInput.RestoreSystemsAfterPause();
 
         // Khôi phục chuột (dự phòng)
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
 
-        // Load lại SampleScene (giống cách từ MainMenu)
-        SceneManager.LoadScene("SampleScene");
+        // Đóng scene pause để quay lại scene đang chơi
+        SceneManager.UnloadSceneAsync("PauseScene");
     }
-         public void QuitToMenu()
-     {
+    public void QuitToMenu()
+    {
+        PauseInput.ClearSuppressedSystems();
         Time.timeScale = 1f;
-         SceneManager.LoadScene("MainMenu");
-     }
+        SceneManager.LoadScene("MainMenu");
+    }
+
+    public void SaveGame()
+    {
+        SaveManager.SaveCurrentGame();
+    }
+
+    private void OnDestroy()
+    {
+        PauseInput.ClearSuppressedSystems();
+    }
 } 

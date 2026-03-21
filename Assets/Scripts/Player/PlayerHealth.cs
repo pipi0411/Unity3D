@@ -98,6 +98,14 @@ public class PlayerHealth : MonoBehaviour, IDamageable
         OnHealthChanged?.Invoke(currentHealth, maxHealth);
     }
 
+    public void SetCurrentHealth(float value)
+    {
+        currentHealth = Mathf.Clamp(value, 0f, maxHealth);
+        isDead = currentHealth <= 0f;
+        regenReadyTime = -1f;
+        OnHealthChanged?.Invoke(currentHealth, maxHealth);
+    }
+
     private void ScheduleAutoRegen()
     {
         if (!enableAutoRegen)

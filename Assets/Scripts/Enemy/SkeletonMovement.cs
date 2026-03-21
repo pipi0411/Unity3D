@@ -45,6 +45,7 @@ public class SkeletonMovement : MonoBehaviour, IDamageable
 
     public float CurrentHealth => currentHealth;
     public float MaxHealth => maxHealth;
+    public bool IsDead => isDead;
 
     void Awake()
     {
@@ -371,5 +372,38 @@ public class SkeletonMovement : MonoBehaviour, IDamageable
 
         float healthPercent = maxHealth > 0f ? currentHealth / maxHealth : 0f;
         healthNumberText.color = Color.Lerp(lowHealthColor, fullHealthColor, Mathf.Clamp01(healthPercent));
+    }
+
+    public void ApplySaveData(Vector3 savedPosition, float savedHealth, bool savedIsDead)
+    {
+        if (agent != null && agent.isOnNavMesh)
+        {
+            agent.Warp(savedPosition);
+            agent.ResetPath();
+        }
+        else
+        {
+            transform.position = savedPosition;
+        }
+
+        currentHealth = Mathf.Clamp(savedHealth, 0f, maxHealth);
+        isDead = savedIsDead || currentHealth <= 0f;
+
+        if (agent != null)
+        {
+            agent.isStopped = isDead;
+        }
+
+        if (animator != null)
+        {
+            animator.SetFloat("Speed", 0f);
+        }
+
+        if (healthNumberText != null)
+        {
+            healthNumberText.gameObject.SetActive(!isDead || !hideHealthNumberOnDeath);
+        }
+
+        RefreshHealthNumber();
     }
 }

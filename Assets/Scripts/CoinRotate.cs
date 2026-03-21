@@ -21,6 +21,16 @@ public class CoinRotate : MonoBehaviour
     private Material mat;
     private bool isCollected;
 
+    public string GetSaveId()
+    {
+        return BuildHierarchyPath(transform);
+    }
+
+    public void RemoveForLoadState()
+    {
+        Destroy(gameObject);
+    }
+
     void Start()
     {
         startPos = transform.position;
@@ -89,5 +99,19 @@ public class CoinRotate : MonoBehaviour
         }
 
         Destroy(gameObject);
+    }
+
+    private static string BuildHierarchyPath(Transform target)
+    {
+        string path = target.name;
+        Transform current = target.parent;
+
+        while (current != null)
+        {
+            path = current.name + "/" + path;
+            current = current.parent;
+        }
+
+        return path;
     }
 }

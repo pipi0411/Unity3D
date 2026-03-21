@@ -40,4 +40,16 @@ public class PlayerCoins : MonoBehaviour
         coins += amount;
         OnCoinsChanged?.Invoke(coins);
     }
+
+    public void SetCoins(int value)
+    {
+        coins = Mathf.Max(0, value);
+        OnCoinsChanged?.Invoke(coins);
+    }
+
+    public void SetMaxCoins(int value)
+    {
+        maxCoins = Mathf.Max(1, value);
+        OnCoinsChanged?.Invoke(coins);
+    }
 }

@@ -4,6 +4,15 @@ using UnityEngine;
 
 public class PlayerWeaponController : MonoBehaviour
 {
+    [System.Serializable]
+    public class WeaponSaveEntry
+    {
+        public WeaponType weaponType;
+        public int bulletsInMagazine;
+        public int totalReserveAmmo;
+        public bool isCurrent;
+    }
+
     private Player player;
     [SerializeField] private Weapon currentWeapon;
     private bool isShooting;
@@ -225,5 +234,125 @@ public class PlayerWeaponController : MonoBehaviour
     public bool HasOnlyOneWeapon()
     {
         return weaponSlots.Count <= 1;
+    }
+
+    public List<WeaponSaveEntry> CreateSaveSnapshot()
+    {
+        List<WeaponSaveEntry> entries = new List<WeaponSaveEntry>();
+
+        for (int i = 0; i < weaponSlots.Count; i++)
+        {
+            Weapon weapon = weaponSlots[i];
+            if (weapon == null)
+            {
+                continue;
+            }
+
+            weapon.InitializeFromDataIfNeeded();
+            entries.Add(new WeaponSaveEntry
+            {
+                weaponType = weapon.weaponType,
+                bulletsInMagazine = Mathf.Max(0, weapon.bulletsInMagazine),
+                totalReserveAmmo = Mathf.Max(0, weapon.totalReserveAmmo),
+                isCurrent = weapon == currentWeapon
+            });
+        }
+
+        return entries;
+    }
+
+    public void ApplySaveSnapshot(List<WeaponSaveEntry> entries)
+    {
+        if (entries == null || entries.Count == 0)
+        {
+            return;
+        }
+
+        List<Weapon> templates = GatherWeaponTemplatesFromScene();
+        List<Weapon> rebuiltSlots = new List<Weapon>();
+        Weapon selectedCurrent = null;
+
+        for (int i = 0; i < entries.Count && rebuiltSlots.Count < maxWeaponSlots; i++)
+        {
+            WeaponSaveEntry entry = entries[i];
+            Weapon template = FindTemplateByType(templates, entry.weaponType);
+            if (template == null)
+            {
+                continue;
+            }
+
+            Weapon runtimeWeapon = template.CreateRuntimeCopy();
+            runtimeWeapon.InitializeFromDataIfNeeded();
+            runtimeWeapon.bulletsInMagazine = Mathf.Clamp(entry.bulletsInMagazine, 0, Mathf.Max(1, runtimeWeapon.magazineCapacity));
+            runtimeWeapon.totalReserveAmmo = Mathf.Max(0, entry.totalReserveAmmo);
+
+            rebuiltSlots.Add(runtimeWeapon);
+
+            if (entry.isCurrent)
+            {
+                selectedCurrent = runtimeWeapon;
+            }
+        }
+
+        if (rebuiltSlots.Count == 0)
+        {
+            return;
+        }
+
+        weaponSlots = rebuiltSlots;
+        currentWeapon = selectedCurrent != null ? selectedCurrent : weaponSlots[0];
+        isReloading = false;
+        isShooting = false;
+        player.weaponVisualController.PlayWeaponEquipAnimation();
+    }
+
+    private List<Weapon> GatherWeaponTemplatesFromScene()
+    {
+        List<Weapon> templates = new List<Weapon>();
+
+        for (int i = 0; i < weaponSlots.Count; i++)
+        {
+            if (weaponSlots[i] != null)
+            {
+                templates.Add(weaponSlots[i]);
+            }
+        }
+
+        if (currentWeapon != null)
+        {
+            templates.Add(currentWeapon);
+        }
+
+        Item_Pickup[] pickups = FindObjectsByType<Item_Pickup>(FindObjectsSortMode.None);
+        for (int i = 0; i < pickups.Length; i++)
+        {
+            Weapon template = pickups[i].PickupWeaponTemplate;
+            if (template != null)
+            {
+                templates.Add(template);
+            }
+        }
+
+        return templates;
+    }
+
+    private static Weapon FindTemplateByType(List<Weapon> templates, WeaponType weaponType)
+    {
+        for (int i = 0; i < templates.Count; i++)
+        {
+            Weapon template = templates[i];
+            if (template == null)
+            {
+                continue;
+            }
+
+            WeaponType type = template.weaponData != null ? template.weaponData.weaponType : template.weaponType;
+            if (type == weaponType)
+            {
+                return template;
+            }
+        }
+
+        return null;
     }
 }

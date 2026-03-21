@@ -244,7 +244,8 @@ public class PlayerMovement : MonoBehaviour
         {
             targetDirection.y = 0;
             Quaternion targetRotation = Quaternion.LookRotation(targetDirection);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+            float effectiveRotationSpeed = rotationSpeed * GameSettings.MouseSensitivity;
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, effectiveRotationSpeed * Time.deltaTime);
         }
     }
 
