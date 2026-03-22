@@ -17,6 +17,10 @@ public class PlayerHealth : MonoBehaviour, IDamageable
     [SerializeField] private bool loadSceneOnDeath = true;
     [SerializeField] private string lostSceneName = "LostGame";
 
+    [Header("Fall Death")]
+    [SerializeField] private bool dieWhenFalling = true;
+    [SerializeField] private float fallDeathY = -10f;
+
     private float currentHealth;
     private bool isDead;
     private float regenReadyTime = -1f;
@@ -42,6 +46,14 @@ public class PlayerHealth : MonoBehaviour, IDamageable
 
     private void Update()
     {
+        if (!isDead && dieWhenFalling && transform.position.y <= fallDeathY)
+        {
+            currentHealth = 0f;
+            OnHealthChanged?.Invoke(currentHealth, maxHealth);
+            HandleDeath();
+            return;
+        }
+
         if (!enableAutoRegen || isDead)
         {
             return;

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
-using NUnit.Framework;
+using System.Collections;
+using TMPro;
 using UnityEngine;
 
 public class PlayerWeaponController : MonoBehaviour
@@ -17,6 +18,7 @@ public class PlayerWeaponController : MonoBehaviour
     [SerializeField] private Weapon currentWeapon;
     private bool isShooting;
     private bool isReloading;
+    private float reloadStartUnscaledTime = -1f;
     [Header("Bullet Settings")]
     [SerializeField] private GameObject bulletPrefab;
     [SerializeField] private float bulletSpeed;
@@ -26,11 +28,26 @@ public class PlayerWeaponController : MonoBehaviour
     [SerializeField] private int maxWeaponSlots = 2; // Giới hạn số lượng vũ khí có thể mang theo
     [SerializeField] private List<Weapon> weaponSlots;
 
+    [Header("Reload Safety")]
+    [SerializeField, Min(0.1f)] private float reloadFailSafeSeconds = 2.2f;
+
+    [Header("Pickup Feedback")]
+    [SerializeField] private TMP_Text slotFullText;
+    [SerializeField] private string slotFullMessage = "Slot đầy";
+    [SerializeField, Min(0f)] private float slotFullTextDuration = 1.5f;
+
+    private Coroutine slotFullTextRoutine;
+
     private void Start()
     {
         player = GetComponent<Player>();
         InitializeWeapons();
         AssignInputEvents();
+
+        if (slotFullText != null)
+        {
+            slotFullText.gameObject.SetActive(false);
+        }
 
         Invoke(nameof(EquipStartingWeapon), .1f);
     }
@@ -57,6 +74,8 @@ public class PlayerWeaponController : MonoBehaviour
     }
     private void Update()
     {
+        HandleReloadFailSafe();
+
         if (isShooting)
         {
             Shoot();
@@ -80,10 +99,33 @@ public class PlayerWeaponController : MonoBehaviour
             if (currentWeapon != null && isReloading == false && currentWeapon.CanReload())
             {
                 isReloading = true;
+                reloadStartUnscaledTime = Time.unscaledTime;
                 isShooting = false;
                 player.weaponVisualController.PlayReloadAnimation();
             }
         };
+    }
+
+    private void HandleReloadFailSafe()
+    {
+        if (!isReloading)
+        {
+            return;
+        }
+
+        float elapsed = Time.unscaledTime - reloadStartUnscaledTime;
+        if (elapsed < Mathf.Max(0.1f, reloadFailSafeSeconds))
+        {
+            return;
+        }
+
+        // Fallback when reload animation event is missed after load/scene transitions.
+        if (currentWeapon != null && currentWeapon.CanReload())
+        {
+            currentWeapon.RefillBullets();
+        }
+
+        OnReloadFinished();
     }
 
     private void EquipWeapon(int i)
@@ -107,7 +149,7 @@ public class PlayerWeaponController : MonoBehaviour
 
         if (weaponSlots.Count >= maxWeaponSlots)
         {
-            Debug.Log("Inventory full! Cannot pick up ");
+            ShowSlotFullFeedback();
             return false; // Không thể nhặt thêm vũ khí nếu đã đầy
         }
 
@@ -116,6 +158,36 @@ public class PlayerWeaponController : MonoBehaviour
         weaponSlots.Add(runtimeWeapon);
         player.weaponVisualController.SwitchOnBackupWeaponModel();
         return true;
+    }
+
+    private void ShowSlotFullFeedback()
+    {
+        if (slotFullText == null)
+        {
+            return;
+        }
+
+        slotFullText.text = string.IsNullOrWhiteSpace(slotFullMessage) ? "Slot đầy" : slotFullMessage;
+        slotFullText.gameObject.SetActive(true);
+
+        if (slotFullTextRoutine != null)
+        {
+            StopCoroutine(slotFullTextRoutine);
+        }
+
+        slotFullTextRoutine = StartCoroutine(HideSlotFullTextAfterDelay());
+    }
+
+    private IEnumerator HideSlotFullTextAfterDelay()
+    {
+        yield return new WaitForSeconds(Mathf.Max(0f, slotFullTextDuration));
+
+        if (slotFullText != null)
+        {
+            slotFullText.gameObject.SetActive(false);
+        }
+
+        slotFullTextRoutine = null;
     }
     private void DropWeapon()
     {
@@ -214,6 +286,7 @@ public class PlayerWeaponController : MonoBehaviour
     public void OnReloadFinished()
     {
         isReloading = false;
+        reloadStartUnscaledTime = -1f;
     }
 
     public bool IsReloading()
@@ -268,6 +341,9 @@ public class PlayerWeaponController : MonoBehaviour
             return;
         }
 
+        // Prevent delayed startup auto-equip from overriding restored save state.
+        CancelInvoke(nameof(EquipStartingWeapon));
+
         List<Weapon> templates = GatherWeaponTemplatesFromScene();
         List<Weapon> rebuiltSlots = new List<Weapon>();
         Weapon selectedCurrent = null;
@@ -302,6 +378,7 @@ public class PlayerWeaponController : MonoBehaviour
         weaponSlots = rebuiltSlots;
         currentWeapon = selectedCurrent != null ? selectedCurrent : weaponSlots[0];
         isReloading = false;
+        reloadStartUnscaledTime = -1f;
         isShooting = false;
         player.weaponVisualController.PlayWeaponEquipAnimation();
     }

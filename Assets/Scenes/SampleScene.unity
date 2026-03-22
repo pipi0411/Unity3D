@@ -154,6 +154,8 @@ MonoBehaviour:
   maxNoDamageTime: 10
   loadSceneOnDeath: 1
   lostSceneName: LostGame
+  dieWhenFalling: 1
+  fallDeathY: -10
 --- !u!114 &50885162
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -258,6 +260,10 @@ PrefabInstance:
     - target: {fileID: 5325505973081566302, guid: e96b74c6f0ecd7a44ad74c414576ee51, type: 3}
       propertyPath: m_Name
       value: SilverPirateCoin (5)
+      objectReference: {fileID: 0}
+    - target: {fileID: 5325505973081566302, guid: e96b74c6f0ecd7a44ad74c414576ee51, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8613749656540837615, guid: e96b74c6f0ecd7a44ad74c414576ee51, type: 3}
       propertyPath: m_LocalPosition.x
@@ -753,7 +759,7 @@ Transform:
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.89, y: 1.4599999, z: -1.26}
+  m_LocalPosition: {x: 0.9, y: 1.4599999, z: -0.06999993}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -910,6 +916,10 @@ PrefabInstance:
     - target: {fileID: 5325505973081566302, guid: e96b74c6f0ecd7a44ad74c414576ee51, type: 3}
       propertyPath: m_Name
       value: SilverPirateCoin (7)
+      objectReference: {fileID: 0}
+    - target: {fileID: 5325505973081566302, guid: e96b74c6f0ecd7a44ad74c414576ee51, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8613749656540837615, guid: e96b74c6f0ecd7a44ad74c414576ee51, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1190,6 +1200,143 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7764542802585528980, guid: 8630cd0e57abb334ab87e275e82e2193, type: 3}
   m_PrefabInstance: {fileID: 519916461}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &535156644
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 535156645}
+  - component: {fileID: 535156647}
+  - component: {fileID: 535156646}
+  m_Layer: 5
+  m_Name: Slot Full
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &535156645
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 535156644}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1807451619}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 289}
+  m_SizeDelta: {x: 200, y: 50}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &535156646
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 535156644}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_text: 
+  m_isRightToLeft: 0
+  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontSharedMaterials: []
+  m_fontMaterial: {fileID: 0}
+  m_fontMaterials: []
+  m_fontColor32:
+    serializedVersion: 2
+    rgba: 4294967295
+  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+  m_enableVertexGradient: 0
+  m_colorMode: 3
+  m_fontColorGradient:
+    topLeft: {r: 1, g: 1, b: 1, a: 1}
+    topRight: {r: 1, g: 1, b: 1, a: 1}
+    bottomLeft: {r: 1, g: 1, b: 1, a: 1}
+    bottomRight: {r: 1, g: 1, b: 1, a: 1}
+  m_fontColorGradientPreset: {fileID: 0}
+  m_spriteAsset: {fileID: 0}
+  m_tintAllSprites: 0
+  m_StyleSheet: {fileID: 0}
+  m_TextStyleHashCode: -1183493901
+  m_overrideHtmlColors: 0
+  m_faceColor:
+    serializedVersion: 2
+    rgba: 4294967295
+  m_fontSize: 36
+  m_fontSizeBase: 36
+  m_fontWeight: 400
+  m_enableAutoSizing: 0
+  m_fontSizeMin: 18
+  m_fontSizeMax: 72
+  m_fontStyle: 1
+  m_HorizontalAlignment: 2
+  m_VerticalAlignment: 512
+  m_textAlignment: 65535
+  m_characterSpacing: 0
+  m_characterHorizontalScale: 1
+  m_wordSpacing: 0
+  m_lineSpacing: 0
+  m_lineSpacingMax: 0
+  m_paragraphSpacing: 0
+  m_charWidthMaxAdj: 0
+  m_TextWrappingMode: 1
+  m_wordWrappingRatios: 0.4
+  m_overflowMode: 0
+  m_linkedTextComponent: {fileID: 0}
+  parentLinkedComponent: {fileID: 0}
+  m_enableKerning: 0
+  m_ActiveFontFeatures: 6e72656b
+  m_enableExtraPadding: 0
+  checkPaddingRequired: 0
+  m_isRichText: 1
+  m_EmojiFallbackSupport: 1
+  m_parseCtrlCharacters: 1
+  m_isOrthographic: 1
+  m_isCullingEnabled: 0
+  m_horizontalMapping: 0
+  m_verticalMapping: 0
+  m_uvLineOffset: 0
+  m_geometrySortingOrder: 0
+  m_IsTextObjectScaleStatic: 0
+  m_VertexBufferAutoSizeReduction: 0
+  m_useMaxVisibleDescender: 1
+  m_pageToDisplay: 1
+  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_isUsingLegacyAnimationComponent: 0
+  m_isVolumetricText: 0
+  m_hasFontAssetChanged: 0
+  m_baseMaterial: {fileID: 0}
+  m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!222 &535156647
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 535156644}
+  m_CullTransparentMesh: 1
 --- !u!1001 &577454570
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1672,6 +1819,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: SilverPirateCoin (4)
       objectReference: {fileID: 0}
+    - target: {fileID: 5325505973081566302, guid: e96b74c6f0ecd7a44ad74c414576ee51, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8613749656540837615, guid: e96b74c6f0ecd7a44ad74c414576ee51, type: 3}
       propertyPath: m_LocalPosition.x
       value: 31.47
@@ -1941,10 +2092,6 @@ PrefabInstance:
       propertyPath: playerCoins
       value: 
       objectReference: {fileID: 50885162}
-    - target: {fileID: 2080683503402560169, guid: f7cd12f915b8c2143885f5737f41d251, type: 3}
-      propertyPath: winSceneName
-      value: WinGame
-      objectReference: {fileID: 0}
     - target: {fileID: 7977769208796770905, guid: f7cd12f915b8c2143885f5737f41d251, type: 3}
       propertyPath: m_LocalPosition.x
       value: 82.77
@@ -2341,6 +2488,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: SilverPirateCoin (9)
       objectReference: {fileID: 0}
+    - target: {fileID: 5325505973081566302, guid: e96b74c6f0ecd7a44ad74c414576ee51, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8613749656540837615, guid: e96b74c6f0ecd7a44ad74c414576ee51, type: 3}
       propertyPath: m_LocalPosition.x
       value: -4.002
@@ -2526,6 +2677,10 @@ PrefabInstance:
     - target: {fileID: 5325505973081566302, guid: e96b74c6f0ecd7a44ad74c414576ee51, type: 3}
       propertyPath: m_Name
       value: SilverPirateCoin (3)
+      objectReference: {fileID: 0}
+    - target: {fileID: 5325505973081566302, guid: e96b74c6f0ecd7a44ad74c414576ee51, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8613749656540837615, guid: e96b74c6f0ecd7a44ad74c414576ee51, type: 3}
       propertyPath: m_LocalPosition.x
@@ -2745,7 +2900,7 @@ Transform:
   m_GameObject: {fileID: 1288117500}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.89, y: 1.4599999, z: -1.26}
+  m_LocalPosition: {x: 0.9, y: 1.4599999, z: -0.06999993}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -3640,6 +3795,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: SilverPirateCoin (6)
       objectReference: {fileID: 0}
+    - target: {fileID: 5325505973081566302, guid: e96b74c6f0ecd7a44ad74c414576ee51, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8613749656540837615, guid: e96b74c6f0ecd7a44ad74c414576ee51, type: 3}
       propertyPath: m_LocalPosition.x
       value: -35.03
@@ -3791,6 +3950,7 @@ RectTransform:
   - {fileID: 1470392199}
   - {fileID: 946235722}
   - {fileID: 1091333670}
+  - {fileID: 535156645}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -3863,6 +4023,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: SilverPirateCoin (8)
       objectReference: {fileID: 0}
+    - target: {fileID: 5325505973081566302, guid: e96b74c6f0ecd7a44ad74c414576ee51, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8613749656540837615, guid: e96b74c6f0ecd7a44ad74c414576ee51, type: 3}
       propertyPath: m_LocalPosition.x
       value: -65.87
@@ -3924,6 +4088,10 @@ PrefabInstance:
     - target: {fileID: 5325505973081566302, guid: e96b74c6f0ecd7a44ad74c414576ee51, type: 3}
       propertyPath: m_Name
       value: SilverPirateCoin (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 5325505973081566302, guid: e96b74c6f0ecd7a44ad74c414576ee51, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8613749656540837615, guid: e96b74c6f0ecd7a44ad74c414576ee51, type: 3}
       propertyPath: m_LocalPosition.x
@@ -4459,6 +4627,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: SilverPirateCoin (2)
       objectReference: {fileID: 0}
+    - target: {fileID: 5325505973081566302, guid: e96b74c6f0ecd7a44ad74c414576ee51, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8613749656540837615, guid: e96b74c6f0ecd7a44ad74c414576ee51, type: 3}
       propertyPath: m_LocalPosition.x
       value: 37.73
@@ -4617,7 +4789,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1673116377051062346, guid: e1c4be41e0fecf74f88839db8621f3cb, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.39
+      value: 0.4
       objectReference: {fileID: 0}
     - target: {fileID: 1673116377051062346, guid: e1c4be41e0fecf74f88839db8621f3cb, type: 3}
       propertyPath: m_LocalPosition.y
@@ -4625,7 +4797,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1673116377051062346, guid: e1c4be41e0fecf74f88839db8621f3cb, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0.19
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1673116377051062346, guid: e1c4be41e0fecf74f88839db8621f3cb, type: 3}
       propertyPath: m_LocalRotation.w
@@ -4666,6 +4838,14 @@ PrefabInstance:
     - target: {fileID: 4584431336650972555, guid: e1c4be41e0fecf74f88839db8621f3cb, type: 3}
       propertyPath: zoomSmoothSpeed
       value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 7569559382059016576, guid: e1c4be41e0fecf74f88839db8621f3cb, type: 3}
+      propertyPath: slotFullText
+      value: 
+      objectReference: {fileID: 535156646}
+    - target: {fileID: 7569559382059016576, guid: e1c4be41e0fecf74f88839db8621f3cb, type: 3}
+      propertyPath: slotFullMessage
+      value: Slot Full
       objectReference: {fileID: 0}
     - target: {fileID: 7958601128203340745, guid: e1c4be41e0fecf74f88839db8621f3cb, type: 3}
       propertyPath: m_Name

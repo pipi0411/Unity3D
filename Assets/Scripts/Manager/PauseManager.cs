@@ -40,14 +40,24 @@ public class PauseManager : MonoBehaviour
     public void ContinueGame()
     {
         Time.timeScale = 1f;
-        PauseInput.RestoreSystemsAfterPause();
 
         // Khôi phục chuột (dự phòng)
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
 
-        // Đóng scene pause để quay lại scene đang chơi
-        SceneManager.UnloadSceneAsync("PauseScene");
+        // Đóng scene pause trước, rồi mới bật lại các system đã tắt để tránh trùng EventSystem.
+        Scene pauseScene = SceneManager.GetSceneByName("PauseScene");
+        if (pauseScene.IsValid() && pauseScene.isLoaded)
+        {
+            AsyncOperation unloadOperation = SceneManager.UnloadSceneAsync("PauseScene");
+            if (unloadOperation != null)
+            {
+                unloadOperation.completed += _ => PauseInput.RestoreSystemsAfterPause();
+                return;
+            }
+        }
+
+        PauseInput.RestoreSystemsAfterPause();
     }
     public void QuitToMenu()
     {
